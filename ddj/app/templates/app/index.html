@@ -30,14 +30,4 @@
     </div>
 </div>
 
-{% if latest_question_list %}
-    <ul>
-    {% for question in latest_question_list %}
-        <li><a href="/app/{{ question.id }}/">{{ question.question_text }}</a></li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No apps are available.</p>
-{% endif %}
-
 {% endblock %}

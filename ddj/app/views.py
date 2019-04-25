@@ -2,21 +2,15 @@
 Definition of views.
 """
 
-from .models import Post
-from .models import Comment
-from django.shortcuts import get_object_or_404
-from django.shortcuts import render
-from django.http import HttpResponse
-from django.http import HttpRequest
+from .models import Post, Comment, Question, Choice
+from django.shortcuts import get_object_or_404, render, redirect
+from django.http import HttpResponse, HttpRequest,HttpResponseRedirect
 from django.template import RequestContext
+from django.urls import reverse
 from django.utils import timezone
 from datetime import datetime
-from .models import Question
-from .forms import PostForm
-from .forms import CommentForm
-from django.shortcuts import redirect
+from .forms import PostForm, CommentForm
 from django.contrib.auth.decorators import login_required
-
 
 def home(request):
     """Renders the home page."""
@@ -56,18 +50,38 @@ def about(request):
         }
     )
 
-def detail(request, question_id):
-    return HttpResponse("You're looking at question %s." % question_id)
-def results(request, question_id):
-    response= "You're looking at the results of questions %s."
-    return HttpResponse(response % question_id)
-def vote(request, question_id):
-    return HttpResponse("You're voting on question %s." % question_id)
+def detail(request, pk):
+    question = get_object_or_404(Question, pk=pk)
+    return render(request, 'app/detail.html', {'question': question})
 
-def index(request):
-    lastest_question_list = Question.objects.order_by('-pub_date')[:5]
-    output = ', '.join([q.question_text for q in lastest_question_list])
-    return HttpResponse(template.render(context, request))
+def vote(request, pk):
+    question = get_object_or_404(Question, pk=pk)
+    try:
+        selected_choice = question.choice_set.get(pk=request.POST['choice'])
+    except (KeyError,Choice.DoesNotExist):
+        return render(request, 'app/detail.html',{
+            'question': question,
+            'error_message':"You didn't select a choice.",
+            })
+    else:
+        selected_choice.votes +=1
+        selected_choice.save()
+        return HttpResponseRedirect(reverse('results', args = (question.id,)))
+
+def results(request, pk):
+    question = get_object_or_404(Question, pk=pk)
+    return render(request,'app/results.html', {'question':question})
+
+def question_list(request):
+    latest_question_list = Question.objects.order_by('-pub_date')[:5]
+    return render(request, 'app/question_list.html',
+                  {
+                       'title':'Question List',
+                       'message':'List of a questions.',
+                       'year':datetime.now().year,
+                       'latest_question_list': latest_question_list,
+                  }
+    )
 
 def post_list(request):
     posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date')

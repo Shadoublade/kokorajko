@@ -63,10 +63,13 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="app\templates\app\add_comment_to_post.html" />
+    <Content Include="app\templates\app\detail.html" />
     <Content Include="app\templates\app\post_detail.html" />
     <Content Include="app\templates\app\post_edit.html" />
     <Content Include="app\templates\app\post_list.html" />
     <Content Include="app\templates\app\post_draft_list.html" />
+    <Content Include="app\templates\app\question_list.html" />
+    <Content Include="app\templates\app\results.html" />
     <Content Include="requirements.txt" />
     <Content Include="db.sqlite3" />
     <Content Include="app\static\app\content\bootstrap.css" />
